@@ -2,7 +2,7 @@
   "name": "@chaos-labs/uniswap-v3-pool-mocker",
   "version": "1.0.1",
   "description": "Contains pool mocker shared code for the plugin and cli",
-  "repository": "github:ChaosLabsInc/uniswap-v3-oracle-pool-mocker-v2",
+  "repository": "github:ChaosLabsInc/uniswap-v3-oracle-pool-mocker",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
