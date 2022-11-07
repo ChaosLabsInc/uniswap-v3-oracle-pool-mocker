@@ -42,7 +42,8 @@ export class UniSwapPoolMocker {
   }
 
   async OverrideSlot0Tick(n: number): Promise<string> {
-    const st = (await this.provider.send("eth_getStorageAt", [this.poolAddress, "0x0"])) as string;
+    const slot0StorageAddress = `0x${numberToStorage(BigNumber.from(0), 64)}`
+    const st = (await this.provider.send("eth_getStorageAt", [this.poolAddress, slot0StorageAddress])) as string;
     if (n > 16777216 - 1) {
       throw new Error("number to big");
     }
@@ -54,21 +55,23 @@ export class UniSwapPoolMocker {
 
   async OverrideObservationTick(n: BigNumber, index: number): Promise<string> {
     const slot = 8 + index;
-    const add = `0x${slot.toString(16)}`;
-    const st = (await this.provider.send("eth_getStorageAt", [this.poolAddress, add])) as string;
+    const storageAddress = `0x${numberToStorage(BigNumber.from(slot), 64)}`;
+    const hardhatStorageAddress = `0x${slot.toString(16)}`;
+    const st = (await this.provider.send("eth_getStorageAt", [this.poolAddress, storageAddress])) as string;
     const tickHex = numberToStorage(n, 14);
     const newSt = "0x" + st.slice(2, 44) + tickHex + st.slice(-8);
-    await this.provider.send("hardhat_setStorageAt", [this.poolAddress, add, newSt]);
+    await this.provider.send("hardhat_setStorageAt", [this.poolAddress, hardhatStorageAddress, newSt]);
     return newSt;
   }
 
   async OverrideObservationTimestamp(ts: number, index: number): Promise<string> {
     const slot = 8 + index;
-    const add = `0x${slot.toString(16)}`;
-    const st = (await this.provider.send("eth_getStorageAt", [this.poolAddress, add])) as string;
+    const storageAddress = `0x${numberToStorage(BigNumber.from(slot), 64)}`;
+    const hardhatStorageAddress = `0x${slot.toString(16)}`;
+    const st = (await this.provider.send("eth_getStorageAt", [this.poolAddress, storageAddress])) as string;
     const tsHex = numberToStorage(BigNumber.from(ts), 8);
     const newSt = "0x" + st.slice(2, 58) + tsHex;
-    await this.provider.send("hardhat_setStorageAt", [this.poolAddress, add, newSt]);
+    await this.provider.send("hardhat_setStorageAt", [this.poolAddress, hardhatStorageAddress, newSt]);
     return newSt;
   }
 
