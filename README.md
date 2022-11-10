@@ -45,3 +45,16 @@ With the ability to control Oracle return values, simulating such scenarios in y
 Oracle manipulation is an additional attack vector. With this method, malicious actors research data sources that various oracle consume as sources of truth. When actors possess the ability to manipulate the underlying data source they trigger downstream effects, manifesting in altered Oracle return values. As a result of manipulated data, actors and contracts can trigger various unwanted behaviours such as modified permissions, transaction execution, emergency pausing / shutdown and more.
 
 With the ability to manipulate Uniswap V3 Oracle return values, simulating such scenarios in your local development environment is possible.
+
+## Development
+
+### Testing
+1. Start a hardhat mainnet fork in a terminal
+```
+npx hardhat node --fork https://mainnet.infura.io/v3/<api-key> --fork-block-number xxxxx
+```
+
+2. Run tests
+```
+npm test
+```
