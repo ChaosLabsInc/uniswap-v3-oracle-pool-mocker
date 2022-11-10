@@ -7,7 +7,7 @@ const rpcURL = "http://localhost:8545";
 
 jest.setTimeout(60 * 1000);
 
-test(`mocker`, async () => {
+test(`mocker base`, async () => {
   const pool = Pools[0];
   const mocker = new UniSwapPoolMocker(rpcURL, pool.address);
   const poolContract = mocker.getPoolContract();
@@ -37,15 +37,17 @@ test(`mocker`, async () => {
   //mock price:
   const twapInterval = 100;
   const price = 4;
+  let upperBoundPrice = price * 1.01 + 0.1;
+  let lowerBoundPrice = price * 0.99 - 0.1;
   await mocker.MockPrice(price, twapInterval, pool.decimals.token0, pool.decimals.token1);
   const prices = await mocker.Prices(twapInterval, pool.decimals.token0, pool.decimals.token1);
-  expect(prices[1]).toBeGreaterThan(price - 0.1);
-  expect(prices[1]).toBeLessThan(price + 0.1);
-  expect(prices[0]).toBeGreaterThan(1 / (price + 0.1));
-  expect(prices[0]).toBeLessThan(1 / (price - 0.1));
+  expect(prices[1]).toBeGreaterThan(lowerBoundPrice);
+  expect(prices[1]).toBeLessThan(upperBoundPrice);
+  expect(prices[0]).toBeGreaterThan(1 / upperBoundPrice);
+  expect(prices[0]).toBeLessThan(1 / lowerBoundPrice);
 });
 
-test(`mocker 2`, async () => {
+test(`mocker concurrent changes`, async () => {
   const pool = Pools[1];
   const mocker = new UniSwapPoolMocker(rpcURL, pool.address);
   const poolContract = mocker.getPoolContract();
@@ -56,20 +58,22 @@ test(`mocker 2`, async () => {
     throw new Error("Cannot connect to local fork on 8545. This test requires a lock fork running.");
   }
 
-  //mock price big:
   const twapInterval = 200;
   let price = 1055;
+  let upperBoundPrice = price * 1.01 + 0.1;
+  let lowerBoundPrice = price * 0.99 - 0.1;
   await mocker.MockPrice(price, twapInterval, pool.decimals.token0, pool.decimals.token1);
   let prices = await mocker.Prices(twapInterval, pool.decimals.token0, pool.decimals.token1);
-  expect(prices[1]).toBeGreaterThan(price - 0.1);
-  expect(prices[1]).toBeLessThan(price + 0.1);
-  expect(prices[0]).toBeGreaterThan(1 / (price + 0.1));
-  expect(prices[0]).toBeLessThan(1 / (price - 0.1));
+  expect(prices[1]).toBeGreaterThan(lowerBoundPrice);
+  expect(prices[1]).toBeLessThan(upperBoundPrice);
+  expect(prices[0]).toBeGreaterThan(1 / upperBoundPrice);
+  expect(prices[0]).toBeLessThan(1 / lowerBoundPrice);
 
-  //mock price big:
   price = 0.005;
+  upperBoundPrice = price * 1.01 + 0.1;
+  lowerBoundPrice = price * 0.99 - 0.1;
   await mocker.MockPrice(price, twapInterval, pool.decimals.token0, pool.decimals.token1);
   prices = await mocker.Prices(twapInterval, pool.decimals.token0, pool.decimals.token1);
-  expect(prices[1]).toBeGreaterThan(price - 0.1);
-  expect(prices[1]).toBeLessThan(price + 0.1);
+  expect(prices[1]).toBeGreaterThan(lowerBoundPrice);
+  expect(prices[1]).toBeLessThan(upperBoundPrice);
 });
